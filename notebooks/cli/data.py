@@ -18,7 +18,7 @@ def generator(m: int, n: int, seed: int, spread: int) -> tuple:
   y: np.ndarray = (x @ slope) + intercept + noise
 
   independant: np.ndarray = np.array(range(n))
-  header: str = f"{dependant}, " + f"{', '.join(f"x_{x}" for x in independant)}"
+  header: str = f"{dependant}," + f"{','.join(f"x_{x}" for x in independant)}"
 
   return x, y, header
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     x, y, header = generator(m = arguments.m, n = arguments.n, seed = arguments.seed, spread = arguments.spread)
     data: np.ndarray = np.column_stack((y, x))
 
-    np.savetxt(arguments.file_name, data, header = header, comments = "")
+    np.savetxt(arguments.file_name, data, header = header, comments = "", delimiter = ",")
     print(f"Successfully generated {len(data)} points in '{arguments.file_name}'")
 
   except Exception as exception:
