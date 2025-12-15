@@ -6,7 +6,7 @@ import seaborn
 
 pairplot_congfig: dict = {
   "kind": "reg",
-  "height": 5,
+  "height": 2.5,
   "line": { "color": "red", "linewidth": 1 },
   "scatter": { "s": 3, "color": "green" }
 }
