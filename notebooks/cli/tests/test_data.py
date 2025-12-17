@@ -1,7 +1,10 @@
 import numpy as np
+from pandas import DataFrame
 import pytest
 from data import generator
+from finance import download
 
+@pytest.mark.data
 @pytest.mark.parametrize("m, n", [
   # (invalid, boundary, valid) i, b, v
   (0, 1), # (b, b)
@@ -18,6 +21,7 @@ def test_count_and_dimensions_valid(m: int, n: int): # generator requires parame
   assert x.shape == (m , n)
   assert y.shape == (m ,)
 
+@pytest.mark.data
 @pytest.mark.parametrize("m, n", [
   # (invalid, boundary, valid) i, b, v
   (-1, 0), # (i, i)
@@ -27,8 +31,10 @@ def test_count_and_dimensions_invalid(m: int, n: int): # failure if the number o
   seed: int = 45 # arbitrary seed number
   spread: int = 60 # arbitrary spread number
 
-  with pytest.raises(ValueError): generator(m = m, n = n, seed = seed, spread = spread)
+  with pytest.raises(ValueError): 
+    generator(m = m, n = n, seed = seed, spread = spread)
 
+@pytest.mark.data
 @pytest.mark.parametrize("seed", [
   100,
   200,
@@ -49,7 +55,7 @@ def test_seed_reproducibility(seed: int):
   np.testing.assert_array_equal(data_I, data_II)
   np.testing.assert_array_equal(data_II, data_I)
 
-
+@pytest.mark.data
 @pytest.mark.parametrize("seed_I, seed_II", [
   (100, 200),
   (12, 34),
@@ -68,3 +74,27 @@ def test_seed_reproducibility_(seed_I: int, seed_II):
 
   with pytest.raises(AssertionError):
     np.testing.assert_array_equal(data_I, data_II)
+
+@pytest.mark.finance
+@pytest.mark.parametrize("ticker", [
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "TSLA",
+])
+def test_valid_tickers(ticker: str):
+  data: DataFrame = download(ticker)
+
+  assert not data.empty
+
+@pytest.mark.finance
+@pytest.mark.parametrize("ticker", [
+  "APL",
+  "MICROSOFT",
+  "N",
+  "TEZLA",
+])
+def test_invalid_tickers(ticker: str):
+  data: DataFrame = download(ticker)
+
+  assert data.empty
