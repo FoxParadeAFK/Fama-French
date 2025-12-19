@@ -1,30 +1,21 @@
 from contextlib import asynccontextmanager
-from typing import Sequence
+from typing import Annotated
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 import numpy as np
-from fastapi import Depends, FastAPI, Form, Request
+from fastapi import FastAPI, Form, Request
 import json
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel, Field
 
-class Data:
-  def __init__(
-    self,
-    Mkt_RF: float = Form(ge=-34.88, le=22.72),
-    SMB: float = Form(ge=-22.30, le=12.16),
-    HML: float = Form(ge=-10.06, le=13.46),
-    RMW: float = Form(ge=-5.94, le=9.14),
-    CMA: float = Form(ge=-10.62, le=4.96),
-    RF: float = Form(ge=0.00, le=0.12)
-    ):
-
-    self.Mkt_RF = Mkt_RF
-    self.SMB = SMB
-    self.HML = HML
-    self.RMW = RMW
-    self.CMA = CMA
-    self.RF = RF
+class Data(BaseModel):
+    Mkt_RF: float =  Field(..., ge = -34.88, le = 22.72)
+    SMB: float = Field(..., ge=-22.30, le=12.16)
+    HML: float = Field(..., ge=-10.06, le=13.46)
+    RMW: float = Field(..., ge=-5.94, le=9.14)
+    CMA: float = Field(..., ge=-10.62, le=4.96)
+    RF: float = Field(..., ge=0.00, le=0.12)
 
 model = {}
 
@@ -48,6 +39,16 @@ templates: Jinja2Templates = Jinja2Templates(directory = "template")
 
 @api.exception_handler(RequestValidationError)
 async def validation_error_handler(request: Request, error: RequestValidationError):
+
+  if request.url.path == "/predict":
+    print(error)
+    return JSONResponse(
+      status_code = 422,
+      content = {
+        "errors": {error["loc"][1]: error["msg"] for error in error.errors()}
+      }
+    )
+
   forms: dict = dict(await request.form())
   errors: dict = {error["loc"][1]: error["msg"] for error in error.errors()}
 
@@ -62,20 +63,34 @@ async def validation_error_handler(request: Request, error: RequestValidationErr
     }
   )
 
-@api.get("/")
-async def main(request: Request):
-  return templates.TemplateResponse(request = request, name = "index.html")
-
-@api.post("/", response_class = HTMLResponse)
-async def prediction(request: Request, data: Data = Depends()):
+def fama_french(data: Data):
   x: np.ndarray = np.array([data.Mkt_RF, data.SMB, data.HML, data.RMW, data.CMA, data.RF])
   y: np.ndarray = (x @ model["M"]) + model["C"]
+  return y.item()
+
+@api.post("/predict")
+async def prediction_json(data: Data):
+  y: float = fama_french(data)
+  return {"results": y}
+
+
+@api.get("/")
+async def main(request: Request):
+  return templates.TemplateResponse(request = request, name = "index.html", 
+                                    context = {
+                                      "errors": {},
+                                      "form": {},
+                                    })
+
+@api.post("/", response_class = HTMLResponse)
+async def prediction(request: Request, data: Annotated[Data, Form()]):
+  y: float = fama_french(data)
 
   return templates.TemplateResponse(
     request = request,
     name = "index.html",
     context = {
-      "results": y.item(),
+      "results": y,
       "errors": {},
       "form": {},
     }
