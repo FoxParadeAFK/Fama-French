@@ -1,0 +1,77 @@
+:root {
+  width: 60vw;
+  height: 100%;
+  padding: 5em;
+  margin: auto;
+  font-size: small;
+}
+
+input {
+  font-family: inherit;
+}
+
+.fama_french_parameters {
+  display: flex;
+  justify-content: center;
+}
+
+.fama_french_parameters form {
+  text-align: center;
+}
+
+.parameters {
+  width: 100%;
+}
+
+.parameter {
+  display: flex;
+  width: 100%;
+}
+
+.parameter .parameter_detail {
+  flex: 1;
+
+  margin: 0.25em 0.5em 0.25em 0.5em;
+  padding: 0.25em 0.5em 0.25em 0.5em;
+}
+
+.parameter input {
+  flex: 4;
+  font-size: inherit;
+  font-family: inherit;
+  margin: 0.25em 0.5em 0.25em 0.5em;
+  padding: 0.25em 0.5em 0.25em 0.5em;
+  border: none;
+  outline: none;
+  border-bottom: 1px solid rgb(219, 219, 219);
+}
+
+.parameters button {
+  font-family: inherit;
+  margin: 0.5em 0.25em 0.5em 0.25em;
+  padding: 0.5em 2.5em 0.5em 2.5em;
+  outline: none;
+  border: none;
+  border-radius: 6px;
+}
+
+.results {
+  text-align: center;
+}
+
+footer .information {
+  display: flex;
+  justify-content: center;
+}
+
+footer .information a {
+  margin: 0em 2em 0em 2em;
+  color: inherit;
+  text-decoration-color: #b7b7b7;
+}
+
+footer .deployment_message {
+  font-size: 10px;
+  text-align: center;
+}
+

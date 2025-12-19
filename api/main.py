@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi.responses import FileResponse, HTMLResponse
+from typing import Sequence
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import numpy as np
 from fastapi import Depends, FastAPI, Form, Request
 import json
@@ -32,7 +35,6 @@ async def lifespan(app: FastAPI):
 
     model["M"] = np.array(parameters["M"])
     model["C"] = np.array(parameters["C"])
-
   yield
 
 api: FastAPI = FastAPI(
@@ -41,11 +43,28 @@ api: FastAPI = FastAPI(
   openapi_url = None,
   lifespan = lifespan
 )
-templates: Jinja2Templates = Jinja2Templates(directory = ".")
+api.mount("/static", StaticFiles(directory="static"), name="static")
+templates: Jinja2Templates = Jinja2Templates(directory = "template")
+
+@api.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, error: RequestValidationError):
+  forms: dict = dict(await request.form())
+  errors: dict = {error["loc"][1]: error["msg"] for error in error.errors()}
+
+  forms: dict = {key: value for key, value in forms.items() if key not in errors}
+
+  return templates.TemplateResponse(
+    request = request,
+    name = "index.html",
+    context = {
+      "form": forms,
+      "errors": errors
+    }
+  )
 
 @api.get("/")
-async def main():
-  return FileResponse("index.html")
+async def main(request: Request):
+  return templates.TemplateResponse(request = request, name = "index.html")
 
 @api.post("/", response_class = HTMLResponse)
 async def prediction(request: Request, data: Data = Depends()):
@@ -56,6 +75,8 @@ async def prediction(request: Request, data: Data = Depends()):
     request = request,
     name = "index.html",
     context = {
-      "results": y
+      "results": y.item(),
+      "errors": {},
+      "form": {},
     }
   )

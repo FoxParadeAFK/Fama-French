@@ -1,0 +1,61 @@
+<head>
+  <link rel = "stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+
+<body>
+  <div class = "header">
+    <h3> Fama-French model</h3>
+    <p> Fama-French is an asset pricing model that expanded from the Capital Asset Pricing Model, CAPM. This specific model is trained specific on Apple, AAPL stocks however, realisitic, it can be trained on any valid ticker. </p>
+
+  </div>
+
+  <div class = "fama_french_parameters">
+    <form method = "post" class = "parameters">
+        <div class = "parameter">
+          <label for = "Mkt_RF" class = "parameter_detail"> Mkt-RF </label>
+          <input type = "number" name = "Mkt_RF" step = "0.01" placeholder = "{{ errors["Mkt_RF"] }}" value = "{{ form["Mkt_RF"] }}">
+        </div>
+        <div class = "parameter">
+          <label for = "SMB" class = "parameter_detail"> SMB </label>
+          <input type = "number" name = "SMB" step = "0.01" placeholder = "{{ errors["SMB"] }}" value = "{{ form["SMB"] }}">
+        </div>      
+        <div class = "parameter">
+          <label for = "HML" class = "parameter_detail"> HML </label>
+          <input type = "number" name = "HML" step = "0.01" placeholder = "{{ errors["HML"] }}" value = "{{ form["HML"] }}">
+        </div>
+        <div class = "parameter">
+          <label for = "RMW" class = "parameter_detail"> RMW </label>
+          <input type = "number" name = "RMW" step = "0.01" placeholder = "{{ errors["RMW"] }}" value = "{{ form["RMW"] }}">
+        </div>
+        <div class = "parameter">
+          <label for = "CMA" class = "parameter_detail"> CMA </label>
+          <input type = "number" name = "CMA" step = "0.01" placeholder = "{{ errors["CMA"] }}" value = "{{ form["CMA"] }}">
+        </div>
+        <div class = "parameter">
+          <label for = "RF" class = "parameter_detail"> RF </label>
+          <input type = "number" name = "RF" step = "0.01" placeholder = "{{ errors["RF"] }}" value = "{{ form["RF"] }}">
+        </div>
+      <button type = "submit"> Predict </button>
+    </form>
+  </div>
+
+  <div class = "results">
+    {% if results %}
+      <p> Results: {{ results }} </p>
+    {% endif %}
+  </div>
+
+  <footer>
+    <div>
+      <h3> About </h3>
+      <p> This page was created by FoxParadeAFK, it was designed to provide some interactions to the Fama-French model, albeit fairly minimal of as now. If you are interested in the general maths behind the multi-linear model, please refer to the notebooks - that should be all, thank you </p>
+    </div>
+    <div class = "information"> 
+      <a href = ""> Notebook </a>
+      <a href = "https://github.com/FoxParadeAFK/Linear-Regression"> GitHub </a>
+    </div>
+    <div class = "deployment_message">
+      <p> <i> 2025 Made with FastAPI and Jinja </i> </p>
+    </div>
+  </footer>
+</body>
