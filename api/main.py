@@ -20,8 +20,8 @@ class Data(BaseModel):
 model = {}
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-  with open("../notebooks/fama_french_parameters.json") as file:
+async def lifespan(api: FastAPI):
+  with open("fama_french_parameters.json") as file:
     parameters: dict = json.load(file)
 
     model["M"] = np.array(parameters["M"])
