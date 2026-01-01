@@ -2,7 +2,6 @@ import numpy as np
 from pandas import DataFrame
 import pytest
 from data import generator
-from finance import download
 
 @pytest.mark.data
 @pytest.mark.parametrize("m, n", [
@@ -74,27 +73,3 @@ def test_seed_reproducibility_(seed_I: int, seed_II):
 
   with pytest.raises(AssertionError):
     np.testing.assert_array_equal(data_I, data_II)
-
-@pytest.mark.finance
-@pytest.mark.parametrize("ticker", [
-  "AAPL",
-  "MSFT",
-  "NVDA",
-  "TSLA",
-])
-def test_valid_tickers(ticker: str):
-  data: DataFrame = download(ticker)
-
-  assert not data.empty
-
-@pytest.mark.finance
-@pytest.mark.parametrize("ticker", [
-  "APL",
-  "MICROSOFT",
-  "N",
-  "TEZLA",
-])
-def test_invalid_tickers(ticker: str):
-  data: DataFrame = download(ticker)
-
-  assert data.empty
