@@ -10,31 +10,40 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 class Data(BaseModel):
-    Mkt_RF: float =  Field(..., ge = -34.88, le = 22.72)
-    SMB: float = Field(..., ge=-22.30, le=12.16)
-    HML: float = Field(..., ge=-10.06, le=13.46)
-    RMW: float = Field(..., ge=-5.94, le=9.14)
-    CMA: float = Field(..., ge=-10.62, le=4.96)
-    RF: float = Field(..., ge=0.00, le=0.12)
+  Mkt_RF: float = Field(..., ge = -34.88, le = 22.72)
+  SMB: float = Field(..., ge=-22.30, le=12.16)
+  HML: float = Field(..., ge=-10.06, le=13.46)
+  RMW: float = Field(..., ge=-5.94, le=9.14)
+  CMA: float = Field(..., ge=-10.62, le=4.96)
 
-model = {}
+class Multi_Linear_Regression():
+  """ Multi-linear regression model definition
+  """
+  alpha: np.ndarray 
+  betas: np.ndarray 
+
+  @classmethod
+  def load(cls, alpha: dict, betas: dict) -> None:
+    cls.alpha: np.ndarray = np.array(alpha)
+    cls.betas: np.ndarray = np.array(betas)
+
+    print(f"Shape {cls.betas.shape}")
+
+  @classmethod
+  def predict(cls, data: Data) -> float:
+    x_test: np.ndarray = np.array([data.Mkt_RF, data.SMB, data.HML, data.RMW, data.CMA])
+    return ((x_test @ cls.betas) + cls.alpha).item()
 
 @asynccontextmanager
 async def lifespan(api: FastAPI):
   with open("fama_french_parameters.json") as file:
     parameters: dict = json.load(file)
+    Multi_Linear_Regression.load(parameters["alpha"], parameters["beta"])
 
-    model["M"] = np.array(parameters["M"])
-    model["C"] = np.array(parameters["C"])
   yield
 
-api: FastAPI = FastAPI(
-  docs_url = None,
-  redoc_url = None,
-  openapi_url = None,
-  lifespan = lifespan
-)
-api.mount("/static", StaticFiles(directory="static"), name="static")
+api: FastAPI = FastAPI(docs_url = None, redoc_url = None, openapi_url = None, lifespan = lifespan)
+api.mount("/static", StaticFiles(directory = "static"), name = "static")
 templates: Jinja2Templates = Jinja2Templates(directory = "template")
 
 @api.exception_handler(RequestValidationError)
@@ -63,28 +72,15 @@ async def validation_error_handler(request: Request, error: RequestValidationErr
     }
   )
 
-def fama_french(data: Data):
-  x: np.ndarray = np.array([data.Mkt_RF, data.SMB, data.HML, data.RMW, data.CMA, data.RF])
-  y: np.ndarray = (x @ model["M"]) + model["C"]
-  return y.item()
-
-@api.post("/predict")
-async def prediction_json(data: Data):
-  y: float = fama_french(data)
-  return {"results": y}
-
-
 @api.get("/")
 async def main(request: Request):
-  return templates.TemplateResponse(request = request, name = "index.html", 
-                                    context = {
-                                      "errors": {},
-                                      "form": {},
-                                    })
+  return templates.TemplateResponse(
+    request = request, name = "index.html", 
+    context = {"errors": {}, "form": {}})
 
 @api.post("/", response_class = HTMLResponse)
 async def prediction(request: Request, data: Annotated[Data, Form()]):
-  y: float = fama_french(data)
+  y: float = Multi_Linear_Regression.predict(data)
 
   return templates.TemplateResponse(
     request = request,
