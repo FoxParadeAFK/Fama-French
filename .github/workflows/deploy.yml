@@ -49,7 +49,7 @@ jobs:
 
       - name: Build and Submit
         run: |
-          gcloud builds submit --tag gcr.io/fama-french-foxparade/fama-french-foxparade
+          gcloud builds submit api --tag gcr.io/fama-french-foxparade/fama-french-foxparade
 
       - name: Deploy to Cloud Run
         run: |
