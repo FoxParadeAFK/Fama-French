@@ -50,7 +50,7 @@ def test_valid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float,
   assert isinstance(json["results"], float)
 
 @pytest.mark.parametrize("mkt_rf, smb, hml, rmw, cma", [
-  (-35.00, 0, 0, 0), # (i, v, v, v, v, v)
+  (-35.00, 0, 0, 0, 0), # (i, v, v, v, v, v)
   (34.00, 0, 0, 0, 0), # (i, v, v, v, v, v)
   (-104.88, -28.32, 0, 0, 0), # (i, i, v, v, v, v)
   (122.72, 14.16, 0, 0, 0), # (i, i, v, v, v, v)
