@@ -34,14 +34,13 @@ def lifespan():
   (-34.88, -22.30, -10.06, -5.94, -10.62, 0.00), # (b, b, b, b, b, b)
   (22.72, 12.16, 13.46, 9.14, 4.96, 0.12), # (b, b, b, b, b, b)
 ])
-def test_valid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float, cma: float, rf: float):
+def test_valid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float, cma: float):
   response: httpx.Response = lifespan.post("/predict", json = {
     "Mkt_RF": mkt_rf,
     "SMB": smb,
     "HML": hml,
     "RMW": rmw,
     "CMA": cma,
-    "RF": rf
   })
 
   json: Any = response.json()
@@ -64,14 +63,13 @@ def test_valid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float,
   (-84.46, -36.30, -13.15, -8.45, -11.23, -0.01), # (i, i, i, i, i, i)
   (25.57, 15.25, 19.25, 12.20, 42.13, 1.12), # (i, i, i, i, i, i)
 ])
-def test_invalid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float, cma: float, rf: float):
+def test_invalid_post(lifespan, mkt_rf: float, smb: float, hml: float, rmw: float, cma: float):
   response: httpx.Response = lifespan.post("/predict", json = {
     "Mkt_RF": mkt_rf,
     "SMB": smb,
     "HML": hml,
     "RMW": rmw,
     "CMA": cma,
-    "RF": rf
   })
 
   assert response.status_code == 422
