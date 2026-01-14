@@ -8,6 +8,7 @@ from fastapi import FastAPI, Form, Request
 import json
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
+import os
 
 class Data(BaseModel):
   Mkt_RF: float = Field(..., ge = -34.88, le = 22.72)
@@ -42,8 +43,11 @@ async def lifespan(api: FastAPI):
 
   yield
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+static_path = os.path.join(current_dir, "static")
+
 api: FastAPI = FastAPI(docs_url = None, redoc_url = None, openapi_url = None, lifespan = lifespan)
-api.mount("/static", StaticFiles(directory = "static"), name = "static")
+api.mount("/static", StaticFiles(directory = static_path), name = "static")
 templates: Jinja2Templates = Jinja2Templates(directory = "template")
 
 @api.exception_handler(RequestValidationError)
