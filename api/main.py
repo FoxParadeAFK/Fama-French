@@ -99,8 +99,8 @@ async def prediction(request: Request, data: Annotated[Data, Form()]):
     }
   )
 
-# solely for testing the prediction API
+# solely for testing the prediction
 @api.post("/predict")
-async def prediction(request: Request, data: Annotated[Data, Form()]):
+async def prediction_json(data: Data):
   y: float = Multi_Linear_Regression.predict(data)
   return {"results": y}
