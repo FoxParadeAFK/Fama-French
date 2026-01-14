@@ -48,8 +48,8 @@ jobs:
         uses: google-github-actions/setup-gcloud@v1
 
       - name: Build and Submit
-        run: |
-          gcloud builds submit api --tag gcr.io/fama-french-foxparade/fama-french-foxparade
+        # standard format: region-docker.pkg.dev / project_id / repo_name / image_name
+        run: gcloud builds submit api --tag us-central1-docker.pkg.dev/fama-french-foxparade/fama-french/fama-french-foxparade
 
       - name: Deploy to Cloud Run
         run: |
