@@ -37,7 +37,10 @@ class Multi_Linear_Regression():
 
 @asynccontextmanager
 async def lifespan(api: FastAPI):
-  with open("fama_french_parameters.json") as file:
+
+  current_dir = os.path.dirname(os.path.abspath(__file__))
+  json_path = os.path.join(current_dir, "fama_french_parameters.json")
+  with open(json_path) as file:
     parameters: dict = json.load(file)
     Multi_Linear_Regression.load(parameters["alpha"], parameters["beta"])
 
