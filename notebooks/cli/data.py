@@ -18,7 +18,7 @@ def generator(m: int, n: int, seed: int, spread: int) -> tuple:
   y: np.ndarray = (x @ slope) + intercept + noise
 
   independant: np.ndarray = np.array(range(n))
-  header: str = f"{dependant}," + f"{','.join(f"x_{x}" for x in independant)}"
+  header: str = "y" + ','.join(f"x_{x}" for x in independant)
 
   return x, y, header
 
